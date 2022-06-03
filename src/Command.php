@@ -21,7 +21,7 @@ class Command
     public function run(array $argv)
     {
         $argvCount = count($argv);
-        if ($argvCount !== 3 && $argvCount !== 4) {
+        if ($argvCount !== 3 && $argvCount !== 4 && $argvCount !== 5) {
             fwrite(STDERR, 'Invalid arguments.' . PHP_EOL);
             exit(1);
         }
@@ -64,6 +64,8 @@ class Command
      */
     private function createCommit()
     {
+        $commitMessage = 'style: php-cs-fixer';
+
         if ((bool) getenv('GITHUB_ACTIONS')) {
             $branch = substr(system('git branch'), 2);
             $accessToken = getenv('GITHUB_TOKEN');
@@ -71,7 +73,7 @@ class Command
 
             system("git remote set-url origin https://{$accessToken}@github.com/{$repositoryName}/");
             system('git add -u');
-            system('git commit -m "php-cs-fixer"');
+            system('git commit -m "'.$commitMessage.'"');
             system("git push -q origin {$branch}");
         } elseif ((bool) getenv('CIRCLECI')) {
             $branch = getenv('CIRCLE_BRANCH');
@@ -81,7 +83,7 @@ class Command
 
             system("git remote set-url origin https://{$accessToken}@github.com/{$repositoryUserName}/{$repositoryName}/");
             system('git add -u');
-            system('git commit -m "php-cs-fixer"');
+            system('git commit -m "'.$commitMessage.'"');
             system("git push -q origin {$branch}");
         } elseif ((bool) getenv('GITLAB_CI')) {
             $branch = getenv('CI_COMMIT_REF_NAME');
@@ -92,7 +94,7 @@ class Command
             system("git remote set-url origin https://gitlab-ci-token:{$token}@{$matches[2]}");
             system("git checkout {$branch}");
             system('git add -u');
-            system('git commit -m "php-cs-fixer"');
+            system('git commit -m "'.$commitMessage.'"');
             system("git push -q origin {$branch}");
         }
     }
